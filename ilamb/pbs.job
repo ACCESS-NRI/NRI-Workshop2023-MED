@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#PBS -N workshop
+# For help with PBS directives on Gadi, go to https://opus.nci.org.au/display/Help/PBS+Directives+Explained
+#PBS -N ilamb_cmip6
 #PBS -l wd
 #PBS -P nf33
 #PBS -q express
@@ -9,19 +10,21 @@
 #PBS -l mem=63GB           
 #PBS -l jobfs=10GB        
 #PBS -l storage=gdata/nf33+gdata/fs38+gdata/oi10+gdata/xp65+gdata/hh5+gdata/ct11+scratch/nf33
-#PBS -o ./output_log
-#PBS -e ./error_log
 
+# ILAMB is provided through projects xp65 and hh5. We will use the latter here
 # module use /g/data/xp65/public/modules
 # module load conda/access-med
-
 module use /g/data/hh5/public/modules
 module load conda
 
+# Define the ILAMB Paths
 export ILAMB_ROOT_PARENT=/g/data/nf33/public/data/ILAMB
 export ILAMB_ROOT=$ILAMB_ROOT_PARENT/ILAMB_ROOT
 export CARTOPY_DATA_DIR=/g/data/xp65/public/apps/cartopy-data
 export BUILD_DIR=./ilamb_result/_build
 
+# Remove output of previous runs
 rm -rf $BUILD_DIR
-mpiexec -n 10 ilamb-run --config CMIP6.cfg --model_setup ./workshop_version.txt --regions global --build_dir $BUILD_DIR
+
+# Run ILAMB in parallel with the CMIP6i.cfg configure file for the models defined in workshop_version.txt
+mpiexec -n 10 ilamb-run --config CMIP6.cfg --model_setup workshop_version.txt --regions global --build_dir $BUILD_DIR
